@@ -495,13 +495,17 @@ class WC_Email extends WC_Settings_API {
 			$css = apply_filters( 'woocommerce_email_styles', ob_get_clean() );
 
 			// apply CSS styles inline for picky email clients
-			try {
-				$emogrifier = new Emogrifier( $content, $css );
-				$content    = $emogrifier->emogrify();
-			} catch ( Exception $e ) {
-				$logger = wc_get_logger();
-				$logger->error( $e->getMessage(), array( 'source' => 'emogrifier' ) );
+			//allow the usage of other email utilities
+			if(apply_filters( 'woocommerce_email_styles_content', true , $content, $css, $this)) {
+				try {
+					$emogrifier = new Emogrifier( $content, $css );
+					$content    = $emogrifier->emogrify();
+				} catch ( Exception $e ) {
+					$logger = wc_get_logger();
+					$logger->error( $e->getMessage(), array( 'source' => 'emogrifier' ) );
+				}
 			}
+
 		}
 		return $content;
 	}
